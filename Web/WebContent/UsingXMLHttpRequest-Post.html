@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>XMLHttpRequest Request Using GET Method</title>
+<script language="javascript">
+function Start()
+{
+	try
+	{
+		xmlhttp = new XMLHttpRequest();
+	}
+	catch(err1)
+	{
+		var ieXmlHttpVersions = new Array();
+		ieXmlHttpVersions[ieXmlHttpVersions.length] = "MSXML2.XMLHttp.5.0";
+		ieXmlHttpVersions[ieXmlHttpVersions.length] = "MSXML2.XMLHttp.4.0";
+		ieXmlHttpVersions[ieXmlHttpVersions.length] = "MSXML2.XMLHttp.3.0";
+		ieXmlHttpVersions[ieXmlHttpVersions.length] = "MSXML2.XMLHttp";
+		ieXmlHttpVersions[ieXmlHttpVersions.length] = "Microsoft.XMLHttp";
+		
+		var i;
+		for (i=0; i < ieXmlHttpVersions.length; i++)
+		{
+			try
+			{
+				var xmlhttp = new ActiveXObject(ieXmlHttpVersions[i]);
+				break;
+			}
+			catch (err2)
+			{
+				/* alert(ieXmlHttpVersions[i] + " not supported."); */
+			}
+		}
+	}
+	
+	var ContentDiv = document.getElementById("Content");
+	if (typeof xmlhttp == "undefined") 
+	{
+		ContentDiv.innerHTML="<h1>XMLHttp cannot be created!</h1>";
+	}
+	else
+	{
+		/* Change the type to POST and make any other necessary changes */
+		xmlhttp.open("POST", "Demo.jsp", true);
+		xmlhttp.onreadystatechange=function() 
+		{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) 
+			{
+				ContentDiv.innerHTML=xmlhttp.responseText;
+				/* append the list of ResponseHeaders to the innerHTML */
+				ContentDiv.innerHTML+=xmlhttp.getAllResponseHeaders().replace(/\n/g, "<br />");
+			}
+		}
+		/* Remember, on a POST we must set the Content-Type */
+		xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+		/* The send method takes parameters with a POST */
+		xmlhttp.send("FirstName=Natalie&LastName=Dunnworth");
+	}
+}
+</script>
+</head>
+<body>
+	<a href="javascript:Start()">Start</a>
+	<div id="Content"></div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<html>
+
+<head>
+<title>Employee Administration</title>
+<link rel="stylesheet" type="text/css" href="Styles/Main.css">
+<script language="javascript" src="Scripts/Ajax.js"></script>
+<script language="javascript" src="Scripts/Effects.js"></script>
+<script language="javascript">
+	var xmlhttp = createXHR();
+	var OutputDiv;
+	function GetEmployeeList(URL)
+	{
+		OutputDiv = document.getElementById("EmployeeList");
+		OutputDiv.innerHTML="<h2>Loading...</h2>";
+		/*
+			Open an XMLHttpRequest using the POST method.  
+				Use the passed in URL.
+			When the state of the request changes, call the Display() method.
+			Send the request.
+		*/
+		xmlhttp.open("POST", URL, true);
+		xmlhttp.onreadystatechange=Display; 
+		
+		/* Remember, on a POST we must set the Content-Type (whether we send parameters or not!) */
+		xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+		/* We are not sending any parameters */
+		xmlhttp.send(null);
+		
+	}
+	
+	function Display()
+	{
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) 
+		{
+			OutputDiv.style.display="block";
+			if (xmlhttp.responseText.indexOf("Failed") == 0)
+			{
+				OutputDiv.className="Warning";
+				OutputDiv.innerHTML=xmlhttp.responseText;
+			}
+			else
+			{
+				//Set the innerHTML property of OutputDiv to the responseText of the xmlhttp object.
+				OutputDiv.innerHTML = xmlhttp.responseText;
+			}
+		}
+	}
+	
+	function GetEmployeeForm(URL,EID)
+	{
+		OutputDiv = document.getElementById("FormDiv");
+		OutputDiv.innerHTML="Loading...";
+		/*
+			Open an XMLHttpRequest using the POST method.
+				Use the passed in URL.
+				Make sure to pass in the EmployeeID as "eid" on the querystring.
+			When the state of the request changes, call the Display() method.
+			Send the request.
+		*/
+		xmlhttp.open("POST", URL, true);
+		xmlhttp.onreadystatechange=Display;
+		xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded;");
+		xmlhttp.send("eid=" + EID);
+	}
+	
+	function UpdateEmployee(URL,FIELD,VALUE,EID)
+	{
+		/*
+			Open an XMLHttpRequest using the POST method.
+				Use the passed in URL.
+				Make sure to pass in the EmployeeID as "eid", the field being changed as "field" and the new field value as "value" on the querystring.
+			When the state of the request changes, call the EmployeeUpdated() method.
+			Send the request.
+		*/
+		xmlhttp.open("POST", URL, true);
+		xmlhttp.onreadystatechange=EmployeeUpdated;
+		xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded;");
+		xmlhttp.send("eid=" + EID + "&field=" + FIELD + "&value=" + VALUE);
+	}
+	
+	function EmployeeUpdated()
+	{
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) 
+		{
+			var MessageDiv = document.getElementById("MessageDiv");
+			if (xmlhttp.responseText.indexOf("Failed") == 0)
+			{
+				MessageDiv.className = "Warning";
+				MessageDiv.innerHTML=xmlhttp.responseText;
+			}
+			else
+			{
+				MessageDiv.innerHTML="Updated!";
+				FadeElem(MessageDiv,255,255,0,255,255,255);
+				setTimeout(function() { GetEmployeeList('EmployeeList.jsp') },"1000");
+					//Call to GetEmployeeList is delayed to give the database a chance to update.
+			}
+		}
+	}
+	
+	window.onload = function()
+	{
+		GetEmployeeList("EmployeeList.jsp");
+	}
+</script>
+</head>
+
+<body>
+	<h1>Employee Administration</h1>
+	<p>Click employee name to modify.</p>
+	<div id="EmployeeList"></div>
+	<div id="FormDiv"></div>
+	<div id="MessageDiv"></div>
+</body>
+</html>
